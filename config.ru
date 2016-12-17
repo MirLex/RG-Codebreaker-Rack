@@ -1,6 +1,3 @@
-require 'bundler'
-Bundler.require
-Bundler.setup(:default)
 require './lib/classes/game.rb'
 require './lib/classes/myrackmiddleware'
 
