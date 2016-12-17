@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<html>
+  <head>
+    <title>WEB page</title>
+    <link rel="stylesheet" href="/stylesheets/application.css" type="text/css">
+  </head>
+  <body>
+    <div id="container">
+
+      <h1> game '<%= game %>'</h1>
+
+      <form>
+        <input id="guessField" name="text" type="text">
+        <input id="guess" type="button" value="guess!">
+      </form>
+      <button onclick="location.href = '/start';">Start</button>
+      <button id='hint'>Hint</button>
+      <!-- <button id='restart'>Restart</button> -->
+      <button onclick="location.href = '/restart';">Restart</button>
+
+      <button id='DEB'>DEB</button>
+    </div>
+    <script type="text/javascript">
+      $( document ).ready(function() {
+        $('#hint').click(function(event) {
+          console.log('Click');
+          
+          $.ajax({
+            type: 'POST',
+            url: '/hint',
+            async: true,
+            cache: false,
+            data: 'gethint',
+            
+            success: function(jsonData,textStatus,jqXHR)
+            {
+              console.log(jsonData);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown)
+            {
+              notice(XMLHttpRequest);
+              notice(textStatus);
+              notice(errorThrown);
+            }
+          });
+        });          
+
+        $('#restart').click(function(event) {
+          console.log('Click restart');
+          
+          $.ajax({
+            type: 'POST',
+            url: '/restart',
+            async: true,
+            cache: false,
+            data: 'restart',
+            
+            success: function(jsonData,textStatus,jqXHR)
+            {
+              console.log(jsonData);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown)
+            {
+              notice(XMLHttpRequest);
+              notice(textStatus);
+              notice(errorThrown);
+            }
+          });
+        });         
+
+        $('#DEB').click(function(event) {
+          console.log('Click DEB');
+          
+          $.ajax({
+            type: 'POST',
+            url: '/DEB',
+            async: true,
+            cache: false,
+            data: 'DEB',
+            
+            success: function(jsonData,textStatus,jqXHR)
+            {
+              console.log(jsonData);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown)
+            {
+              notice(XMLHttpRequest);
+              notice(textStatus);
+              notice(errorThrown);
+            }
+          });
+        });        
+
+        $('#guess').click(function(event) {
+          console.log('Click guess');
+          $.ajax({
+            type: 'POST',
+            url: '/guess',
+            async: true,
+            cache: false,
+            data: 'guess=' + $('#guessField').val(),
+            
+            success: function(jsonData,textStatus,jqXHR)
+            {
+              console.log(jsonData);
+
+              if (jsonData.status == 'Fail') {
+                alert(jsonData.text);
+              }
+
+              if (jsonData.status == 'Ok') {
+                // mark_guess
+                // Status
+              }
+
+              // if (jsonData.status == 'game_over') {
+              //   alert(jsonData.text)
+              // }
+              // result = JSON.parse(jsonData);
+              // console.log(result);
+
+              // if (result['errors'].length > 0) {
+              //   notice(result['errors']);
+              // } else {
+              //   $('[data-id-project="'+id_project+'"]').remove();
+              //   notice(result['data']['status']);
+              // }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown)
+            {
+              notice(XMLHttpRequest);
+              notice(textStatus);
+              notice(errorThrown);
+            }
+          });
+        //};
+        });
+      });
+    </script>
+  </body>
+</html>
