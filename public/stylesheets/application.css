@@ -16,3 +16,25 @@ body {
 a {
   color: #0000FF;
 }
+
+.notice-block{
+    position: absolute;
+    width: 400px;
+    right: 20px;
+    top: 20px;
+}
+
+.notice{
+    border: 1px solid #3b689c;
+    border-radius: 5px;
+    background: #0288D1;
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 5px 10px;
+    z-index: 99999;
+    margin: 10px 0;
+}
+
+.notice-message {
+    color: #FFF;
+    padding: 20px 10px;
+}
