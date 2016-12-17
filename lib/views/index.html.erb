@@ -2,49 +2,151 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <html>
   <head>
-    <title>WEB page</title>
+    <title>Codebreaker</title>
     <link rel="stylesheet" href="/stylesheets/application.css" type="text/css">
   </head>
   <body>
+    <div class="notice-block"></div>
     <div id="container">
-
-      <h1> game '<%= game %>'</h1>
-
-      <form>
-        <input id="guessField" name="text" type="text">
-        <input id="guess" type="button" value="guess!">
-      </form>
-      <button onclick="location.href = '/start';">Start</button>
-      <button id='hint'>Hint</button>
-      <!-- <button id='restart'>Restart</button> -->
-      <button onclick="location.href = '/restart';">Restart</button>
-
-      <button id='DEB'>DEB</button>
+      <h3 id="game_block" style="display: none"></h3>
+      <center> <button id="start_game_btn" onclick="location.href = '/start';">Start Game</button> </center>
     </div>
     <script type="text/javascript">
       $( document ).ready(function() {
+
+        
+        index = JSON.parse('<%= index %>');
+        if (index.status == 'new_game') {
+          $('#game_block').text(index.text).show()
+        }
+
+        if (index.status == 'game_started'){
+          $('#start_game_btn').hide();
+          var form = '  <form>\
+                          <input id="guessField" name="text" type="text">\
+                          <input id="guess" type="button" value="guess!">\
+                        </form>';
+          var btns  = '<button id="hint">Hint</button>';
+              btns += '<button id="restart">Restart</button>';
+
+          $('#container').append(form).append(btns);
+        }
+
+        function notice(message) {
+          var noticeDiv = $('<div class="notice"><p class="notice-message">'+message+'</p></div>');
+          $('.notice-block').append(noticeDiv.fadeIn(500).delay(3000).fadeOut(500));
+        };
+
+        function mark_guess(guess_result) {
+          result = "";
+          for (i=0 ;i<guess_result[0]; i++) {
+            result += '+';
+          }          
+
+          for (i=0; i<guess_result[1]; i++) {
+            result += '-';
+          }
+
+          return result;
+        }
+
         $('#hint').click(function(event) {
-          console.log('Click');
-          
+          console.log('Click hint')
           $.ajax({
             type: 'POST',
             url: '/hint',
             async: true,
             cache: false,
-            data: 'gethint',
             
-            success: function(jsonData,textStatus,jqXHR)
-            {
-              console.log(jsonData);
+            success: function(jsonData,textStatus,jqXHR) {
+              notice('HINT:' + jsonData);
             },
-            error: function(XMLHttpRequest, textStatus, errorThrown)
-            {
+            error: function(XMLHttpRequest, textStatus, errorThrown){
               notice(XMLHttpRequest);
               notice(textStatus);
               notice(errorThrown);
             }
           });
-        });          
+        }); 
+
+        $('#guess').click(function(event) {
+          console.log('Click guess');
+          $.ajax({
+            type: 'POST',
+            url: '/guess',
+            async: true,
+            cache: false,
+            data: 'guess=' + $('#guessField').val(),
+            
+            success: function(jsonData,textStatus,jqXHR) {
+              if (jsonData.status == 'invalid_input') {
+                notice(jsonData.text);
+              } else if (jsonData.status == 'game_over') {
+                notice(jsonData.text);
+                $('#guess').hide();
+                
+                var show_history = $('<button id="show_history">Show History</button>');
+                var save_history = $('<button id="save_history">Save History</button>');
+
+                show_history.click(function(event) {
+                  console.log('Click show_history');
+          
+                  $.ajax({
+                    type: 'POST',
+                    url: '/show_history',
+                    async: true,
+                    cache: false,
+                    data: 'show_history',
+                    
+                    success: function(jsonData,textStatus,jqXHR)
+                    {
+                      $('#game_block').text(jsonData).show()
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown)
+                    {
+                      notice(XMLHttpRequest);
+                      notice(textStatus);
+                      notice(errorThrown);
+                    }
+                  });
+                });
+
+                save_history.click(function(event) {
+                  console.log('Click save_history');
+
+                  var name = prompt('Enter your name', 'name');
+   
+                  $.ajax({
+                    type: 'POST',
+                    url: '/save_history',
+                    async: true,
+                    cache: false,
+                    data: 'name=' + name,
+                    
+                    success: function(jsonData,textStatus,jqXHR) {
+                      notice(jsonData);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown)
+                    {
+                      notice(XMLHttpRequest);
+                      notice(textStatus);
+                      notice(errorThrown);
+                    }
+                  });
+                });
+
+                $('#container').append(show_history).append(save_history);
+              } else {
+                notice(mark_guess(jsonData.result));
+              }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+              notice(XMLHttpRequest);
+              notice(textStatus);
+              notice(errorThrown);
+            }
+          });
+        });         
 
         $('#restart').click(function(event) {
           console.log('Click restart');
@@ -56,9 +158,8 @@
             cache: false,
             data: 'restart',
             
-            success: function(jsonData,textStatus,jqXHR)
-            {
-              console.log(jsonData);
+            success: function(jsonData,textStatus,jqXHR) {
+              location.reload();
             },
             error: function(XMLHttpRequest, textStatus, errorThrown)
             {
@@ -69,73 +170,6 @@
           });
         });         
 
-        $('#DEB').click(function(event) {
-          console.log('Click DEB');
-          
-          $.ajax({
-            type: 'POST',
-            url: '/DEB',
-            async: true,
-            cache: false,
-            data: 'DEB',
-            
-            success: function(jsonData,textStatus,jqXHR)
-            {
-              console.log(jsonData);
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown)
-            {
-              notice(XMLHttpRequest);
-              notice(textStatus);
-              notice(errorThrown);
-            }
-          });
-        });        
-
-        $('#guess').click(function(event) {
-          console.log('Click guess');
-          $.ajax({
-            type: 'POST',
-            url: '/guess',
-            async: true,
-            cache: false,
-            data: 'guess=' + $('#guessField').val(),
-            
-            success: function(jsonData,textStatus,jqXHR)
-            {
-              console.log(jsonData);
-
-              if (jsonData.status == 'Fail') {
-                alert(jsonData.text);
-              }
-
-              if (jsonData.status == 'Ok') {
-                // mark_guess
-                // Status
-              }
-
-              // if (jsonData.status == 'game_over') {
-              //   alert(jsonData.text)
-              // }
-              // result = JSON.parse(jsonData);
-              // console.log(result);
-
-              // if (result['errors'].length > 0) {
-              //   notice(result['errors']);
-              // } else {
-              //   $('[data-id-project="'+id_project+'"]').remove();
-              //   notice(result['data']['status']);
-              // }
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown)
-            {
-              notice(XMLHttpRequest);
-              notice(textStatus);
-              notice(errorThrown);
-            }
-          });
-        //};
-        });
       });
     </script>
   </body>
