@@ -18,31 +18,22 @@ class Game
       Rack::Response.new(render('index.html.erb'))
     when '/start'
       @game = @request.session[:game] = Codebreaker::Game.new
-      Rack::Response.new do |response|
-        response.redirect('/')
-      end
+      redirect('/')
     when '/restart'
       @game = @request.session[:game] = nil
-      Rack::Response.new do |response|
-        response.redirect('/')
-      end
+      redirect('/')
     when '/hint'
-      render_response(@game.hint)
+      response_json(@game.hint)
     when '/guess'
-      answer = {}
-      answer[:result] = @game.guess(@request.params['guess'])
-      if @game.status.nil?
-        render_response(answer)
-      else
+      answer = { result:  @game.guess(@request.params['guess']) }
+      return response_json(answer) if @game.status.nil?
         answer[:status] = 'game_over'
         answer[:text] = text(@game.status)
-        render_response(answer)
-      end
+        response_json(answer)
     when '/show_history'
-      render_response(@game.show_history)
+      response_json(@game.show_history)
     when '/save_history'
-      render_response(@game.save_history(@request.params['name']))
-      
+      response_json(@game.save_history(@request.params['name']))
     else Rack::Response.new('Not Found', 404)
     end
   end
@@ -52,15 +43,21 @@ class Game
     ERB.new(File.read(path)).result(binding)
   end
 
-  def render_response(data)
+  def response_json(data)
     Rack::Response.new(data.to_json, 200, 'Content-Type' => 'application/json')
+  end
+
+  def redirect(url)
+      Rack::Response.new do |response|
+        response.redirect(url)
+      end
   end
 
   def index
     answer = {}
     if @game.nil?
       answer[:status] = 'new_game'
-      answer[:text] =   'GAME RULES' # text(:rules)
+      answer[:text] =   text(:rules)
     else
       answer[:status] = 'game_started'
     end
