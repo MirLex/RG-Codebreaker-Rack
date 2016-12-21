@@ -78,7 +78,7 @@ $( document ).ready(function() {
 
                 $('#container').append(show_history).append(save_history);
               } else {
-                notice(mark_guess(jsonData.result));
+                notice(jsonData.result);
               }
             });
           });
