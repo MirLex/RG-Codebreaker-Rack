@@ -18,18 +18,17 @@ class Game
       Rack::Response.new(render('index.html.erb'))
     when '/start'
       @game = @request.session[:game] = Codebreaker::Game.new
-      redirect('/')
+      response_json(status: 'game_started')
     when '/restart'
       @game = @request.session[:game] = nil
-      redirect('/')
     when '/hint'
       response_json(@game.hint)
     when '/guess'
-      answer = { result:  @game.guess(@request.params['guess']) }
+      answer = { result: @game.guess(@request.params['guess']) }
       return response_json(answer) if @game.status.nil?
-        answer[:status] = 'game_over'
-        answer[:text] = text(@game.status)
-        response_json(answer)
+      answer[:status] = 'game_over'
+      answer[:text] = text(@game.status)
+      response_json(answer)
     when '/show_history'
       response_json(@game.show_history)
     when '/save_history'
@@ -48,21 +47,25 @@ class Game
   end
 
   def redirect(url)
-      Rack::Response.new do |response|
-        response.redirect(url)
-      end
+    Rack::Response.new do |response|
+      response.redirect(url)
+    end
   end
 
-  def index
-    answer = {}
-    if @game.nil?
-      answer[:status] = 'new_game'
-      answer[:text] =   text(:rules)
-    else
-      answer[:status] = 'game_started'
-    end
-    answer.to_json
+  def game_rules
+    'Rules' # text(:rules)
   end
+
+  # def index
+  #   answer = {}
+  #   if @game.nil?
+  #     answer[:status] = 'new_game'
+  #     answer[:text] =   'Rules' #text(:rules)
+  #   else
+  #     answer[:status] = 'game_started'
+  #   end
+  #   answer.to_json
+  # end
 
   def text(message)
     Codebreaker::Game::TEXT[message]
