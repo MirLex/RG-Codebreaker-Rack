@@ -4,17 +4,13 @@
   <head>
     <title>Codebreaker</title>
     <link rel="stylesheet" href="/stylesheets/application.css" type="text/css">
-    <link rel="stylesheet" href="/stylesheets/application.css" type="text/css">
   </head>
   <body>
     <div class="notice-block"></div>
     <div id="container">
-      <h3 id="game_block" style="display: none"></h3>
-      <center> <button id="start_game_btn" onclick="location.href = '/start';">Start Game</button> </center>
+      <h3 id="game_block"> <%= game_rules %> </h3>
+      <center> <button id="start_game_btn" >Start Game</button> </center>
     </div>
-    <script type="text/javascript">
-      index = JSON.parse('<%= index %>');
-    </script>
     <script type="text/javascript" src='/js/app.js'></script>
   </body>
 </html>
