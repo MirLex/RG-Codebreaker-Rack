@@ -14,27 +14,49 @@ class Game
 
   def response
     case @request.path
-    when '/' then
-      Rack::Response.new(render('index.html.erb'))
-    when '/start'
-      @game = @request.session[:game] = Codebreaker::Game.new
-      response_json(status: 'game_started')
-    when '/restart'
-      @game = @request.session[:game] = nil
-    when '/hint'
-      response_json(@game.hint)
-    when '/guess'
-      answer = { result: @game.guess(@request.params['guess']) }
-      return response_json(answer) if @game.status.nil?
-      answer[:status] = 'game_over'
-      answer[:text] = text(@game.status)
-      response_json(answer)
-    when '/show_history'
-      response_json(@game.show_history)
-    when '/save_history'
-      response_json(@game.save_history(@request.params['name']))
+    when '/' then index
+    when '/start' then start
+    when '/restart' then restart
+    when '/hint' then hint
+    when '/guess' then guess
+    when '/show_history' then show_history
+    when '/save_history' then save_history
     else Rack::Response.new('Not Found', 404)
     end
+  end
+
+  private
+  def index
+    Rack::Response.new(render('index.html.erb'))
+  end
+
+  def start
+    @game = @request.session[:game] = Codebreaker::Game.new
+    response_json(status: 'game_started')
+  end
+
+  def restart
+    @game = @request.session[:game] = nil
+  end
+
+  def hint
+    response_json(@game.hint)
+  end
+
+  def show_history
+    response_json(@game.show_history)
+  end
+
+  def save_history
+    response_json(@game.save_history(@request.params['name']))
+  end
+
+  def guess
+    answer = { result: @game.guess(@request.params['guess']) }
+    return response_json(answer) if @game.status.nil?
+    answer[:status] = 'game_over'
+    answer[:text] = text(@game.status)
+    response_json(answer)
   end
 
   def render(template)
@@ -53,19 +75,8 @@ class Game
   end
 
   def game_rules
-    'Rules' # text(:rules)
+    text(:rules)
   end
-
-  # def index
-  #   answer = {}
-  #   if @game.nil?
-  #     answer[:status] = 'new_game'
-  #     answer[:text] =   'Rules' #text(:rules)
-  #   else
-  #     answer[:status] = 'game_started'
-  #   end
-  #   answer.to_json
-  # end
 
   def text(message)
     Codebreaker::Game::TEXT[message]
