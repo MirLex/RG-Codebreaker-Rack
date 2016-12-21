@@ -26,6 +26,7 @@ class Game
   end
 
   private
+
   def index
     Rack::Response.new(render('index.html.erb'))
   end
@@ -51,8 +52,12 @@ class Game
     response_json(@game.save_history(@request.params['name']))
   end
 
+  def mark_guess(guess)
+    '+' * guess.first + '-' * guess.last
+  end
+
   def guess
-    answer = { result: @game.guess(@request.params['guess']) }
+    answer = { result: mark_guess(@game.guess(@request.params['guess'])) }
     return response_json(answer) if @game.status.nil?
     answer[:status] = 'game_over'
     answer[:text] = text(@game.status)
