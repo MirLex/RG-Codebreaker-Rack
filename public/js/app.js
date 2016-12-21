@@ -1,20 +1,4 @@
 $( document ).ready(function() {
-   if (index.status == 'new_game') {
-    $('#game_block').text(index.text).show()
-  }
-
-  if (index.status == 'game_started'){
-    $('#start_game_btn').hide();
-    var form = '  <form>\
-                    <input id="guessField" name="text" type="text">\
-                    <input id="guess" type="button" value="guess!">\
-                  </form>';
-    var btns  = '<button id="hint">Hint</button>';
-        btns += '<button id="restart">Restart</button>';
-
-    $('#container').append(form).append(btns);
-  }
-
   function notice(message) {
     var noticeDiv = $('<div class="notice"><p class="notice-message">'+message+'</p></div>');
     $('.notice-block').append(noticeDiv.fadeIn(500).delay(3000).fadeOut(500));
@@ -54,47 +38,65 @@ $( document ).ready(function() {
     });
   }
 
-  $('#hint').click(function(event) {
-    ajax_post('/hint',null , function(jsonData) {
-       notice('HINT:' + jsonData);
-    });
-  }); 
+  $('#start_game_btn').click(function(event) {
+    ajax_post('/start', null ,function(jsonData) {
+      if (jsonData.status == 'game_started') {
+        $('#game_block').hide();
+        $('#start_game_btn').hide();
+          var form = $('  <form>\
+                          <input id="guessField" name="text" type="text">\
+                        </form>');
+          var hint  = $('<button id="hint">Hint</button>');
+          var restart = $('<button id="restart">Restart</button>');
 
-  $('#restart').click(function(event) {
-    ajax_post('/restart',null , function(jsonData) {
-      location.reload();
-    });
-  }); 
+          guess = $('<input id="guess" type="button" value="guess!">')
 
-  $('#guess').click(function(event) {
-    ajax_post('/guess','guess=' + $('#guessField').val(), function(jsonData) {
-      if (jsonData.status == 'invalid_input') {
-        notice(jsonData.text);
-      } else if (jsonData.status == 'game_over') {
-        notice(jsonData.text);
-        $('#guess').hide();
-        $('#hint').hide();
-        
-        var show_history = $('<button id="show_history">Show History</button>');
-        var save_history = $('<button id="save_history">Save History</button>');
+          guess.click(function(event) {
+            ajax_post('/guess','guess=' + $('#guessField').val(), function(jsonData) {
+              if (jsonData.status == 'invalid_input') {
+                notice(jsonData.text);
+              } else if (jsonData.status == 'game_over') {
+                notice(jsonData.text);
+                $('#guess').hide();
+                $('#hint').hide();
+                
+                var show_history = $('<button id="show_history">Show History</button>');
+                var save_history = $('<button id="save_history">Save History</button>');
 
-        show_history.click(function(event) {
-          ajax_post('/show_history',null ,function(jsonData) {
-            $('#game_block').text(jsonData).show()
+                show_history.click(function(event) {
+                  ajax_post('/show_history',null ,function(jsonData) {
+                    $('#game_block').text(jsonData).show()
+                  });
+                });
+
+                save_history.click(function(event) {
+                  var name = prompt('Enter your name', 'name');
+                  ajax_post('/save_history','name=' + name, function(jsonData) {
+                    notice(jsonData);
+                  });
+                });
+
+                $('#container').append(show_history).append(save_history);
+              } else {
+                notice(mark_guess(jsonData.result));
+              }
+            });
           });
-        });
 
-        save_history.click(function(event) {
-          var name = prompt('Enter your name', 'name');
-          ajax_post('/save_history','name=' + name, function(jsonData) {
-            notice(jsonData);
+          form.find('#guessField').after(guess);
+
+          hint.click(function(event) {
+            ajax_post('/hint',null , function(jsonData) {
+               notice('HINT:' + jsonData);
+            });
           });
-        });
 
-        $('#container').append(show_history).append(save_history);
-      } else {
-        notice(mark_guess(jsonData.result));
+          restart.click(function(event) {
+              location.reload();
+          });
+
+          $('#container').append(form).append(hint).append(restart);
       }
     });
-  }); 
+  });
 });
