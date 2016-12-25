@@ -10,8 +10,8 @@ class MyRackMiddleware
     @request = Rack::Request.new(env)
     case @request.path
     when '/guess'
-      return @app.call(env) if Codebreaker::GameController.validCode?(@request.params['guess'])
-      data = { status: 'invalid_input' ,text: Codebreaker::Game::TEXT[:incorrect] }
+      return @app.call(env) if Codebreaker::GameController.valid_code?(@request.params['guess'])
+      data = { status: 'invalid_input' ,text: 'invalid input' }
       Rack::Response.new(data.to_json, 200, 'Content-Type' => 'application/json')
     else
       @app.call(env)
