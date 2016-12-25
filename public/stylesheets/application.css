@@ -7,10 +7,26 @@ body {
 #container {
   width: 75%;
   margin: 0 auto;
-  background-color: #FFF;
+  background-color: #b3e5fc;
   padding: 20px 40px;
   border: solid 1px black;
   margin-top: 20px;
+}
+
+#main-form {
+    width: 50%;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+#guessField {
+    float: left;
+    width: 70%;
+    margin-right: 10px;
+}
+
+button#hint {
+    float: right;
 }
 
 a {
