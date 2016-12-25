@@ -1,0 +1,30 @@
+---
+- date: 25-12-2016-11-35
+  status: :lose
+  user: name
+  attempts: 0
+---
+- date: 25-12-2016-11-36
+  status: :win
+  user: Lol
+  attempts: 9
+---
+- date: 25-12-2016-11-38
+  status: :lose
+  user: nameG
+  attempts: 0
+---
+- date: 25-12-2016-11-39
+  status: :lose
+  user: ddd
+  attempts: 0
+---
+- date: 25-12-2016-11-59
+  status: :lose
+  user: name
+  attempts: 0
+---
+- date: 25-12-2016-12-00
+  status: :lose
+  user: name
+  attempts: 0

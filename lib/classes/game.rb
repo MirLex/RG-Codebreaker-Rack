@@ -25,8 +25,6 @@ class Game
     end
   end
 
-  private
-
   def index
     Rack::Response.new(render('index.html.erb'))
   end
@@ -45,11 +43,18 @@ class Game
   end
 
   def show_history
-    response_json(@game.show_history)
+    results = Array[]
+    results = YAML.load_stream(open('history.yaml'))
+    response_json(results)
   end
 
   def save_history
-    response_json(@game.save_history(@request.params['name']))
+    data = ['date' => Time.now.strftime('%d-%m-%Y-%H-%M'),
+            'status' => @game.status,
+            'user' => @request.params['name'],
+            'attempts' => @game.number_of_turns]
+    File.open('history.yaml', 'ab') { |f| f.write(data.to_yaml) }
+    response_json('saved')
   end
 
   def mark_guess(guess)
@@ -57,10 +62,11 @@ class Game
   end
 
   def guess
-    answer = { result: mark_guess(@game.guess(@request.params['guess'])) }
+    answer = { result: mark_guess(@game.guess(@request.params['guess'])), turns: @game.number_of_turns }
     return response_json(answer) if @game.status.nil?
     answer[:status] = 'game_over'
     answer[:text] = text(@game.status)
+    answer[:history] = @game.show_history
     response_json(answer)
   end
 
@@ -84,6 +90,6 @@ class Game
   end
 
   def text(message)
-    Codebreaker::Game::TEXT[message]
+    Codebreaker::Game::TEXT[message.to_s]
   end
 end
