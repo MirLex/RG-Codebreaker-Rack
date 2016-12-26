@@ -1,7 +1,7 @@
 $( document ).ready(function() {
   function notice(message) {
     var noticeDiv = $('<div class="notice"><p class="notice-message">'+message+'</p></div>');
-    $('.notice-block').append(noticeDiv.fadeIn(500).delay(3000).fadeOut(500));
+    $('.notice-block').append(noticeDiv.fadeIn(500).delay(5000).fadeOut(500));
   };
 
   function ajax_post(url,data,cb) {
