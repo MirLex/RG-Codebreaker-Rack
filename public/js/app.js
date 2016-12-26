@@ -4,19 +4,6 @@ $( document ).ready(function() {
     $('.notice-block').append(noticeDiv.fadeIn(500).delay(3000).fadeOut(500));
   };
 
-  function mark_guess(guess_result) {
-    result = "";
-    for (i=0 ;i<guess_result[0]; i++) {
-      result += '+';
-    }          
-
-    for (i=0; i<guess_result[1]; i++) {
-      result += '-';
-    }
-
-    return result;
-  }
-
   function ajax_post(url,data,cb) {
     $.ajax({
       type: 'POST',
