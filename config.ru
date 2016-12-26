@@ -1,3 +1,6 @@
+require 'Codebreaker_ML'
+require 'json'
+require 'erb'
 require './lib/classes/game.rb'
 require './lib/classes/myrackmiddleware'
 
