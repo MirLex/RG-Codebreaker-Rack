@@ -1,7 +1,3 @@
-require 'Codebreaker_ML'
-require 'json'
-require 'erb'
-
 class Game
   def self.call(env)
     new(env).response
